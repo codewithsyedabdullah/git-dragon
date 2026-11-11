@@ -1,0 +1,24 @@
+[package]
+name = "git-dragon"
+version = "1.2.0"
+edition = "2021"
+description = "Procedural pixel-art GitHub dragon generator for your profile README"
+license = "MIT"
+repository = "https://github.com/codewithsyedabdullah/git-dragon"
+homepage = "https://github.com/codewithsyedabdullah/git-dragon"
+readme = "README.md"
+keywords = ["github", "profile", "dragon", "pixel-art", "gif"]
+categories = ["command-line-utilities", "visualization"]
+
+[dependencies]
+color_quant = "1.1"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde"] }
+gif = "0.13"
+png = "0.17"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2.10", default-features = false, features = ["json", "gzip", "native-tls"] }
+
+# Keep dev/test builds lean on memory-constrained machines (no DWARF emission).
+[profile.dev]
+debug = 0

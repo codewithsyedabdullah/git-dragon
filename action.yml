@@ -1,0 +1,40 @@
+name: git-dragon
+description: Procedural pixel-art GitHub dragon generator for your profile README
+author: Syed Abdullah
+branding:
+  icon: "flame"
+  color: "green"
+inputs:
+  login:
+    description: GitHub account whose dragon to draw
+    required: false
+    default: ${{ github.repository_owner }}
+  window:
+    description: Contribution window (annual, rolling)
+    required: false
+    default: annual
+  canon:
+    description: Use default dragon colors instead of GitHub language colors
+    required: false
+    default: "false"
+  output-dir:
+    description: Folder that receives dragon.gif, dragon.png, and share-card.png
+    required: false
+    default: dragon
+  commit:
+    description: Set to "false" to skip committing and pushing generated assets
+    required: false
+    default: "true"
+  branch:
+    description: Target branch for commits
+    required: false
+    default: output
+  token:
+    description: Token for reading public data and pushing to the output branch
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    GIT_DRAGON_REPO: "codewithsyedabdullah/git-dragon"

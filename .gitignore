@@ -1,0 +1,12 @@
+# Rust build artifacts
+/target
+
+# Generated dragon assets (local runs)
+/dragon
+/demo-*
+/test-render
+*.snapshot.json
+snapshot.json
+
+# Editor noise
+*.rs.bk
