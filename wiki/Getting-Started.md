@@ -17,6 +17,7 @@ jobs:
   update-dragon:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: codewithsyedabdullah/git-dragon@v1
         with:
           window: annual

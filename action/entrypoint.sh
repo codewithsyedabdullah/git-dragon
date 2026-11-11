@@ -38,6 +38,14 @@ if [ -z "$TOKEN" ]; then
     TOKEN="${GITHUB_TOKEN:-}"
 fi
 
+if [ -n "$TOKEN" ]; then
+    export GITHUB_TOKEN="$TOKEN"
+fi
+
+# The workspace is owned by the runner user, not the container user.
+git config --global --add safe.directory "${GITHUB_WORKSPACE:-$PWD}" 2>/dev/null || true
+git config --global --add safe.directory '*' 2>/dev/null || true
+
 echo "git-dragon: collecting activity for @${LOGIN} (${WINDOW} window)"
 git-dragon collect "$LOGIN" --window "$WINDOW" --output /tmp/git-dragon-snapshot.json
 

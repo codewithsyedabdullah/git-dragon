@@ -61,11 +61,14 @@ jobs:
   update-dragon:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: codewithsyedabdullah/git-dragon@v1
         with:
           window: annual
           branch: output
 ```
+
+The action is referenced as `@v1`, so publish that tag first in this repository (`git tag v1 && git push origin v1`, or create a release named `v1`).
 
 Then add this to your profile `README.md`:
 
