@@ -55,7 +55,7 @@ impl Palette {
     fn build(frames: &[Frame]) -> Palette {
         let mut unique: HashSet<[u8; 3]> = HashSet::new();
         for frame in frames {
-            for p in frame.rgba.chunks_exact(4).filter(|p| p[3] != 0) {
+            for p in frame.rgba.as_chunks::<4>().0.iter().filter(|p| p[3] != 0) {
                 unique.insert([p[0], p[1], p[2]]);
             }
         }
@@ -79,7 +79,7 @@ impl Palette {
         let mut training: Vec<u8> = Vec::new();
         let step = (frames.len() / 8).max(1);
         for frame in frames.iter().step_by(step) {
-            for p in frame.rgba.chunks_exact(4).filter(|p| p[3] != 0) {
+            for p in frame.rgba.as_chunks::<4>().0.iter().filter(|p| p[3] != 0) {
                 training.extend_from_slice(&[p[0], p[1], p[2], 255]);
             }
         }
