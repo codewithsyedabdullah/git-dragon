@@ -17,6 +17,29 @@ const FIRE_EMBER: [u8; 3] = [140, 28, 8];
 /// Edge length of one chunky effect "pixel".
 const BLOCK: i32 = 2;
 
+/// Soft warm covering around the flame: halo rings in block units with a
+/// blend alpha, hottest ring first. Mirrored in assets/js/dragon.js.
+const FIRE_HALO: [(i32, i32, f32); 16] = [
+    (-1, 0, 0.40),
+    (1, 0, 0.40),
+    (0, -1, 0.40),
+    (0, 1, 0.40),
+    (-1, -1, 0.22),
+    (1, -1, 0.22),
+    (-1, 1, 0.22),
+    (1, 1, 0.22),
+    (-2, 0, 0.14),
+    (2, 0, 0.14),
+    (0, -2, 0.14),
+    (0, 2, 0.14),
+    (-2, -2, 0.07),
+    (2, -2, 0.07),
+    (-2, 2, 0.07),
+    (2, 2, 0.07),
+];
+/// How far the halo colour is dimmed towards black (a covering, not a flame).
+const GLOW_DIM: f32 = 0.45;
+
 /// Size of a fire breath.
 #[derive(Clone, Copy, Debug)]
 pub struct FireSpec {
@@ -59,6 +82,8 @@ fn noise(a: i32, b: i32, c: i32) -> f32 {
 /// Draw a flame leaving the mouth to the left.
 ///
 /// `progress` runs 0.0..1.0 over the breath; `tick` is the frame index (drives flicker).
+/// A soft warm covering (dim halo rings) is blended around the flame sheet first,
+/// then the hot core is drawn opaque on top.
 pub fn draw_fire(
     canvas: &mut Canvas,
     spec: FireSpec,
@@ -75,6 +100,7 @@ pub fn draw_fire(
     }
     let tick_i = tick as i32;
     let steps = (length / BLOCK as f32) as i32;
+    let mut blocks: Vec<(i32, i32, [u8; 3])> = Vec::new();
     for i in 0..steps {
         let d = (i * BLOCK) as f32;
         let f = d / length;
@@ -102,8 +128,23 @@ pub fn draw_fire(
             };
             let x = mouth.0 - i * BLOCK - BLOCK;
             let y = mouth.1 + (centre + dy) as i32 - BLOCK / 2;
-            canvas.block(x, y, BLOCK, rgb);
+            blocks.push((x, y, rgb));
         }
+    }
+
+    // Soft warm covering around the flame sheet, then the hot core on top.
+    for &(x, y, rgb) in &blocks {
+        let glow = [
+            (rgb[0] as f32 * GLOW_DIM).round() as u8,
+            (rgb[1] as f32 * GLOW_DIM).round() as u8,
+            (rgb[2] as f32 * GLOW_DIM).round() as u8,
+        ];
+        for &(ox, oy, a) in FIRE_HALO.iter() {
+            canvas.block_soft(x + ox * BLOCK, y + oy * BLOCK, BLOCK, glow, a);
+        }
+    }
+    for &(x, y, rgb) in &blocks {
+        canvas.block(x, y, BLOCK, rgb);
     }
 }
 
@@ -218,6 +259,18 @@ mod tests {
         let mut peak = Canvas::new(400, 200);
         draw_fire(&mut peak, spec, (300, 100), 0.5, 3);
         assert!(lit(&peak) > 200);
+    }
+
+    #[test]
+    fn fire_has_soft_covering() {
+        let spec = fire_spec(Stage::Legendary).expect("fire");
+        let mut canvas = Canvas::new(400, 200);
+        draw_fire(&mut canvas, spec, (300, 100), 0.5, 3);
+        // The halo adds dim warm pixels the hot core never writes.
+        let dim_warm = canvas.rgba.chunks(4).any(|p| {
+            p[3] != 0 && p[0] > 0 && p[0] < 120 && p[1] < 90 && p[2] < 90 && p[1] > p[2]
+        });
+        assert!(dim_warm, "halo should add dim warm pixels around the flame");
     }
 
     #[test]

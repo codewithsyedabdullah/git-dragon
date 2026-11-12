@@ -396,6 +396,35 @@ impl Canvas {
         }
     }
 
+    /// Alpha-blend one pixel over the canvas (standard "over" compositing);
+    /// out-of-bounds writes are ignored.
+    pub fn put_blend(&mut self, x: i32, y: i32, rgb: [u8; 3], alpha: f32) {
+        if x < 0 || y < 0 || x as usize >= self.w || y as usize >= self.h {
+            return;
+        }
+        let i = (y as usize * self.w + x as usize) * 4;
+        let dst_a = self.rgba[i + 3] as f32 / 255.0;
+        let out_a = alpha + dst_a * (1.0 - alpha);
+        if out_a <= 0.0 {
+            return;
+        }
+        let dst_w = dst_a * (1.0 - alpha);
+        for c in 0..3 {
+            self.rgba[i + c] =
+                ((rgb[c] as f32 * alpha + self.rgba[i + c] as f32 * dst_w) / out_a).round() as u8;
+        }
+        self.rgba[i + 3] = (out_a * 255.0).round() as u8;
+    }
+
+    /// Alpha-blend a `size`x`size` block (the fire breath halo).
+    pub fn block_soft(&mut self, x: i32, y: i32, size: i32, rgb: [u8; 3], alpha: f32) {
+        for dy in 0..size {
+            for dx in 0..size {
+                self.put_blend(x + dx, y + dy, rgb, alpha);
+            }
+        }
+    }
+
     /// Draw `layer` with its top-left at `origin`.
     pub fn blit(&mut self, layer: &Layer, origin: (i32, i32)) {
         for sy in 0..layer.h {
