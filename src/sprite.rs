@@ -409,9 +409,9 @@ impl Canvas {
             return;
         }
         let dst_w = dst_a * (1.0 - alpha);
-        for c in 0..3 {
-            self.rgba[i + c] =
-                ((rgb[c] as f32 * alpha + self.rgba[i + c] as f32 * dst_w) / out_a).round() as u8;
+        for (c, &channel) in rgb.iter().enumerate() {
+            let blended = (channel as f32 * alpha + self.rgba[i + c] as f32 * dst_w) / out_a;
+            self.rgba[i + c] = blended.round() as u8;
         }
         self.rgba[i + 3] = (out_a * 255.0).round() as u8;
     }
