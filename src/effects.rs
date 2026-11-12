@@ -267,9 +267,10 @@ mod tests {
         let mut canvas = Canvas::new(400, 200);
         draw_fire(&mut canvas, spec, (300, 100), 0.5, 3);
         // The halo adds dim warm pixels the hot core never writes.
-        let dim_warm = canvas.rgba.chunks(4).any(|p| {
-            p[3] != 0 && p[0] > 0 && p[0] < 120 && p[1] < 90 && p[2] < 90 && p[1] > p[2]
-        });
+        let dim_warm = canvas
+            .rgba
+            .chunks(4)
+            .any(|p| p[3] != 0 && p[0] > 0 && p[0] < 120 && p[1] < 90 && p[2] < 90 && p[1] > p[2]);
         assert!(dim_warm, "halo should add dim warm pixels around the flame");
     }
 
