@@ -12,8 +12,8 @@ use git_dragon::stage::Stage;
 
 fn snapshot(contributions: u64, languages: &[(&str, u32)]) -> AccountSnapshot {
     AccountSnapshot {
-        login: "octocat".to_owned(),
-        account_id: 583_231,
+        login: "test-user".to_owned(),
+        account_id: 1,
         observed_on: chrono::NaiveDate::from_ymd_opt(2026, 11, 1).expect("date"),
         total_contributions: contributions,
         monthly_contributions: 0,
@@ -153,7 +153,7 @@ fn outputs_are_real_files_ready_for_a_readme() {
     assert_eq!(&fs::read(&report.png).expect("png")[1..4], b"PNG");
     assert_eq!(&fs::read(&report.share_card).expect("card")[1..4], b"PNG");
     let html = fs::read_to_string(&report.preview).expect("html");
-    assert!(html.contains("dragon.gif") && html.contains("@octocat"));
+    assert!(html.contains("dragon.gif") && html.contains("@test-user"));
     fs::remove_dir_all(dir).ok();
 }
 
