@@ -2,7 +2,7 @@
 
 An emerald pixel-art dragon for your GitHub profile `README.md`. It hatches from an egg, grows with your contribution count, takes on the colours of the languages you write, and loops as a small animated GIF: flapping wings, blinking eyes, and (once it is old enough) breathing fire.
 
-**Try it live:** [codewithsyedabdullah.github.io](https://codewithsyedabdullah.github.io/) — type any GitHub username and your dragon hatches right in the browser (same renderer, the real sprite art, no install).
+**Try it live:** [codewithsyedabdullah.github.io/git-dragon](https://codewithsyedabdullah.github.io/git-dragon/) — type any GitHub username and your dragon hatches right in the browser (same renderer, the real sprite art, no install).
 
 ![The six evolution stages](docs/evolution.png)
 

@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>git-dragon — hatch your GitHub contribution dragon</title>
+<meta name="description" content="Type any GitHub username and watch your contribution dragon hatch, grow and breathe fire — a live, fully client-side port of the git-dragon renderer.">
+<meta property="og:title" content="git-dragon — hatch your GitHub contribution dragon">
+<meta property="og:description" content="Enter a GitHub username. Get a pixel dragon: stage from your contributions, coat from your languages, fire when you've earned it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://codewithsyedabdullah.github.io/git-dragon/">
+<meta property="og:image" content="https://raw.githubusercontent.com/codewithsyedabdullah/git-dragon/output/dragon/share-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css?v=5">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="nav-logo" href="#generator">
+      <span class="logo-mark">🐉</span>
+      git<em>-dragon</em>
+    </a>
+    <div class="nav-links">
+      <a href="#generator">Generator</a>
+      <a href="#evolution">Evolution</a>
+      <a href="#how">How it works</a>
+      <a href="#embed">Embed</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-cta" href="https://github.com/codewithsyedabdullah/git-dragon" target="_blank" rel="noopener">★ GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================== GENERATOR ============================== -->
+<header class="hero" id="generator">
+  <canvas id="embers" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+
+    <div class="hero-left">
+      <p class="kicker">GITHUB ACTIVITY → PIXEL DRAGON</p>
+      <h1>Your commits<br>hatch a <span class="grad">dragon</span>.</h1>
+      <p class="sub">
+        Type any GitHub username and their git-dragon appears live in your browser:
+        stage from contribution count, coat tinted by their top languages, wings
+        flapping, eyes blinking — and fire breath once they've earned it.
+        The same renderer that powers the <a href="https://github.com/codewithsyedabdullah/git-dragon" target="_blank" rel="noopener">git-dragon GitHub Action</a>,
+        ported line-for-line to JavaScript.
+      </p>
+
+      <form class="gen-form" id="gen-form" autocomplete="off">
+        <input class="gen-input" id="gen-input" type="text" maxlength="39"
+               placeholder="GitHub username — try codewithsyedabdullah" spellcheck="false"
+               autocapitalize="none" autocorrect="off" aria-label="GitHub username">
+        <button class="btn btn-primary" id="btn-generate" type="submit">Hatch 🐉</button>
+      </form>
+
+      <div class="gen-row">
+        <span class="demo-label">Try:</span>
+        <span class="demo-chips">
+          <button class="chip" data-user="codewithsyedabdullah">codewithsyedabdullah</button>
+          <button class="chip" data-demo="egg">🥚 egg</button>
+          <button class="chip" data-demo="adolescent">🔥 adolescent</button>
+          <button class="chip" data-demo="legendary">✨ legendary</button>
+        </span>
+        <button class="btn btn-small" id="btn-random" type="button">🎲 random</button>
+      </div>
+      <div class="gen-row"><span id="gen-status" role="status"></span></div>
+
+      <ul class="hero-badges">
+        <li>100% client-side — nothing leaves your browser</li>
+        <li>Real git-dragon sprites</li>
+        <li>Deterministic 48-frame loop</li>
+      </ul>
+    </div>
+
+    <div class="hero-right">
+      <div class="dragon-card" id="dragon-card">
+        <div class="dragon-head">
+          <img id="dragon-avatar" class="dragon-avatar" alt="" style="display:none">
+          <div class="dragon-avatar-fallback" id="dragon-avatar-fallback">🥚</div>
+          <div class="dragon-id">
+            <div class="login"><a id="profile-link" href="#" target="_blank" rel="noopener"><span id="dragon-login">@demo-user</span></a></div>
+            <div class="who muted" id="dragon-who">bundled demo — type a username for the real thing</div>
+          </div>
+          <div class="dragon-chips">
+            <span class="chip chip-stage" id="chip-stage">Stage 5 · Legendary Dragon</span>
+            <span class="chip chip-fire" id="chip-fire">🔥 breathes fire</span>
+            <span class="chip chip-coat" id="chip-coat" style="display:none"></span>
+          </div>
+        </div>
+        <p class="dragon-error" id="dragon-error"></p>
+        <div class="dragon-stage">
+          <canvas id="dragon-canvas" width="640" height="300" aria-label="Animated contribution dragon"></canvas>
+        </div>
+        <div class="dragon-foot">
+          <span id="frame-counter">frame 1 / 48</span>
+          <button class="btn btn-small" id="btn-download" type="button">⬇ PNG still</button>
+          <button class="btn btn-small" id="btn-share-card" type="button">⬇ Share card</button>
+          <button class="btn btn-small" id="btn-copy-link" type="button">🔗 Copy link</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-tile"><div class="stat-value" id="stat-total">–</div><div class="stat-label">contributions this year</div></div>
+        <div class="stat-tile"><div class="stat-value" id="stat-monthly">–</div><div class="stat-label">this month</div></div>
+        <div class="stat-tile"><div class="stat-value" id="stat-current">–</div><div class="stat-label">current streak</div></div>
+        <div class="stat-tile"><div class="stat-value" id="stat-longest">–</div><div class="stat-label">longest streak</div></div>
+      </div>
+
+      <div class="progress-tile">
+        <div class="progress-head">
+          <span id="progress-label">…</span>
+          <span class="progress-count"><span id="progress-count"></span> <span class="muted" id="extra-stats"></span></span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+
+      <div class="side-panels">
+        <div class="side-panel">
+          <h4>Top languages</h4>
+          <div id="lang-chips"></div>
+        </div>
+        <div class="side-panel">
+          <h4>Language coat</h4>
+          <div id="coat-zones"></div>
+        </div>
+      </div>
+      <div id="data-sources" class="muted"></div>
+    </div>
+
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>EGG</span><b>✦</b><span>BABY</span><b>✦</b><span>YOUNG</span><b>✦</b><span>ADOLESCENT</span><b>✦</b><span>ADULT</span><b>✦</b><span>LEGENDARY</span><b>✦</b><span>FLAP</span><b>✦</b><span>BLINK</span><b>✦</b><span>FIRE</span><b>✦</b><span>EMBER</span><b>✦</b>
+    <span>EGG</span><b>✦</b><span>BABY</span><b>✦</b><span>YOUNG</span><b>✦</b><span>ADOLESCENT</span><b>✦</b><span>ADULT</span><b>✦</b><span>LEGENDARY</span><b>✦</b><span>FLAP</span><b>✦</b><span>BLINK</span><b>✦</b><span>FIRE</span><b>✦</b><span>EMBER</span><b>✦</b>
+  </div>
+</div>
+
+<!-- ============================== EVOLUTION ============================== -->
+<section class="block" id="evolution">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">SIX STAGES · ONE DRAGON</p>
+      <h2>From egg to <span class="grad">legend</span></h2>
+      <p>The stage comes from the contribution count — max of this calendar year and this month, exactly like the action. Click through the evolution, or preview any stage in the generator above.</p>
+    </div>
+
+    <div class="stage-grid" id="stage-grid"></div>
+  </div>
+</section>
+
+<!-- ============================== HOW IT WORKS ============================== -->
+<section class="block alt" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">UNDER THE SCALES</p>
+      <h2>How a dragon is forged</h2>
+      <p>The website runs the exact same pipeline as the Rust action — collect, stage, coat, animate — just in your browser.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">STEP 1</span>
+        <h3>Collect</h3>
+        <p>Public contribution calendar (jogruber API), profile and repos (GitHub REST). All CORS-enabled, all fetched straight from your browser.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">STEP 2</span>
+        <h3>Stage</h3>
+        <p>The annual contribution window — plus current month, whichever is larger — picks one of six evolution stages.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">STEP 3</span>
+        <h3>Coat</h3>
+        <p>Top three languages by repository count tint three zones. Dark colours are lifted so the outline stays readable; mixed profiles keep more emerald.</p>
+      </div>
+      <div class="step">
+        <span class="step-num">STEP 4</span>
+        <h3>Animate</h3>
+        <p>A seamless 48-frame loop: three wing flaps, two blinks, one fire breath, rising embers and twinkling stars for legends.</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <h3>Evolution thresholds</h3>
+      <table>
+        <thead><tr><th>Contributions</th><th>Stage</th><th>What changes</th></tr></thead>
+        <tbody>
+          <tr><td><code>0</code></td><td><strong>Dragon Egg</strong></td><td>Shell with a slow glint. Resets every January 1st.</td></tr>
+          <tr><td><code>1 – 149</code></td><td><strong>Baby Dragon</strong></td><td>Big head, tiny horns and wings; flaps and blinks.</td></tr>
+          <tr><td><code>150 – 499</code></td><td><strong>Young Dragon</strong></td><td>Longer body, wider wings, longer horns, back spikes.</td></tr>
+          <tr><td><code>500 – 1,199</code></td><td><strong>Adolescent Dragon</strong></td><td>Veined wings, stronger legs, <strong>small fire breath</strong>.</td></tr>
+          <tr><td><code>1,200 – 2,499</code></td><td><strong>Adult Dragon</strong></td><td>Full size, crest-tipped tail, bigger fire breath.</td></tr>
+          <tr><td><code>2,500+</code></td><td><strong>Legendary Dragon</strong></td><td>Aura, rising embers, twinkling stars, golden wing edges.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <h3>Language coat zones</h3>
+      <table>
+        <thead><tr><th>Zone</th><th>From</th><th>Parts</th><th>Strength</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Primary</strong></td><td>most-used language</td><td>scales, belly, body highlights</td><td><code>0.55 + 0.40 × share</code></td></tr>
+          <tr><td><strong>Secondary</strong></td><td>second language</td><td>wing membranes</td><td><code>0.45 + 0.50 × share</code></td></tr>
+          <tr><td><strong>Tertiary</strong></td><td>third language</td><td>horns and crest highlights</td><td><code>0.50 + 0.45 × share</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-card">
+      <h3>The 48-frame loop</h3>
+      <div class="loop-timeline">
+        <span class="chip">🪽 3 wing flaps · amplitude grows per stage</span>
+        <span class="chip">😉 blinks at frames 4–7 and 21–23</span>
+        <span class="chip">🔥 fire breath frames 26–45 (adolescent+)</span>
+        <span class="chip">✨ embers + stars (legendary)</span>
+        <span class="chip">🥚 shell glint (egg)</span>
+        <span class="chip">🎞 ~3.4 s per loop · 14 fps</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== TECH ============================== -->
+<section class="block" id="tech">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">WHY IT'S COOL</p>
+      <h2>Built like the real thing</h2>
+      <p>Not a re-drawing — the actual hand-finished sprite layers, tinted and composited with the same math as the Rust renderer.</p>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">🎨</div>
+        <h3>Real sprites, real tinting</h3>
+        <p>The 16 layered PNGs from the action are colorized in-browser with the same HSV rules: green zones → primary, warm cream → belly or horns.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🧮</div>
+        <h3>Faithful port</h3>
+        <p>Stage thresholds, streak math, coat strengths, nearest-neighbour rotated wing blits, deterministic noise — ported line-for-line from Rust.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">⚡</div>
+        <h3>Zero backend</h3>
+        <p>Every API used is CORS-enabled. GitHub Pages serves static files; all fetching, counting and rendering happens on your machine.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🔥</div>
+        <h3>Procedural fire</h3>
+        <p>The flame is drawn pixel-by-pixel from a sine envelope and a hash-noise flicker — no image assets, just like the original.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📦</div>
+        <h3>Offline-ready demos</h3>
+        <p>Bundled snapshots for all six stages mean the site always hatches something — even when GitHub rate-limits or you're offline.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🧬</div>
+        <h3>Deterministic</h3>
+        <p>Same username, same dragon. No randomness anywhere — the loop is seamless and the stills are reproducible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== EMBED ============================== -->
+<section class="block alt" id="embed">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">TAKE YOUR DRAGON WITH YOU</p>
+      <h2>Embed it anywhere</h2>
+      <p>GitHub READMEs can't run JavaScript, so the action stays the way to get an auto-updating GIF — this site is the live checker. Both snippets below are ready to copy.</p>
+    </div>
+    <div class="embed-grid">
+      <div class="embed-card">
+        <h3>🔗 Link to the live dragon</h3>
+        <p>Anyone who clicks gets this page with the username pre-filled.</p>
+        <pre class="code-block" id="embed-link"></pre>
+        <div class="embed-actions">
+          <button class="btn btn-small" id="btn-copy-embed" type="button">📋 Copy markdown</button>
+          <button class="btn btn-small" id="btn-copy-link" type="button">🔗 Copy page link</button>
+        </div>
+      </div>
+      <div class="embed-card">
+        <h3>🤖 Auto-updating GIF on your profile</h3>
+        <p>Add this workflow to your <code>&lt;username&gt;/&lt;username&gt;</code> repo — the action generates a real <code>dragon.gif</code> daily.</p>
+        <pre class="code-block" id="embed-action"></pre>
+        <div class="embed-actions">
+          <button class="btn btn-small" id="btn-copy-action" type="button">📋 Copy workflow</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FAQ ============================== -->
+<section class="block" id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">QUESTIONS</p>
+      <h2>FAQ</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Why is my dragon still an egg?</summary>
+        <p>The stage uses the <strong>current calendar year</strong> window (it resets every January 1st) — the same rule as the action. Contributions from last year don't count. Keep committing and watch it grow. If this month alone beats the year total, the month wins (that's the <code>max(total, monthly)</code> rule).</p>
+      </details>
+      <details>
+        <summary>Is my data safe? What's sent where?</summary>
+        <p>Everything happens in your browser. The site fetches <strong>public</strong> data from GitHub's REST API and the public contributions API, computes the stage, streaks and language coat locally, and renders on a canvas. Nothing is stored, logged or proxied.</p>
+      </details>
+      <details>
+        <summary>Why does my dragon look slightly different from my profile GIF?</summary>
+        <p>The action can use GitHub's GraphQL colours and your exact repository list with a token; the website uses the tokenless REST path with an offline Linguist colour table, so a tint may differ by a shade. Stage, animation and effects are identical.</p>
+      </details>
+      <details>
+        <summary>Why did it say the language data (repo API) was unavailable?</summary>
+        <p>GitHub's tokenless REST API allows 60 requests per hour per visitor IP — shared networks, VPNs and offices burn through that quickly. When it's exhausted your dragon still hatches (stage, streaks and animation come from the contributions API), but the language coat falls back to the classic emerald. Results are also cached in your browser for an hour, so re-checking the same user costs nothing.</p>
+      </details>
+      <details>
+        <summary>I hit "Generate" and got an error.</summary>
+        <p>Check the spelling (letters, numbers, dashes) and that the account exists. If the contributions API is unreachable from your network, wait a moment and retry — or explore the bundled demo snapshots (egg, adolescent, legendary…) which always work offline.</p>
+      </details>
+      <details>
+        <summary>Can I get a GIF like the action produces?</summary>
+        <p>The browser port animates on canvas and exports PNG stills and a 1280×640 share card. For an embeddable GIF that updates itself, add the <a href="https://github.com/codewithsyedabdullah/git-dragon" target="_blank" rel="noopener">git-dragon action</a> to your profile repository — the <a href="#embed">Embed</a> section has the ready-made workflow.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FOOTER ============================== -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="nav-logo" href="#generator" style="margin-bottom:14px; display:inline-flex;">
+          <span class="logo-mark">🐉</span> git<em>-dragon</em>
+        </a>
+        <p class="muted" style="max-width:38ch; margin:12px 0 0; font-size:14px;">
+          An emerald pixel-art dragon that hatches from your GitHub activity.
+          Sprites forged in Rust, hatched in JavaScript.
+        </p>
+      </div>
+      <div>
+        <h4>git-dragon project</h4>
+        <ul>
+          <li><a href="https://github.com/codewithsyedabdullah/git-dragon" target="_blank" rel="noopener">Repository</a></li>
+          <li><a href="https://github.com/codewithsyedabdullah/git-dragon/blob/main/README.md" target="_blank" rel="noopener">README & action inputs</a></li>
+          <li><a href="https://github.com/codewithsyedabdullah/git-dragon/releases" target="_blank" rel="noopener">Releases</a></li>
+          <li><a href="https://github.com/codewithsyedabdullah/git-dragon/issues" target="_blank" rel="noopener">Issues</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>This site</h4>
+        <ul>
+          <li><a href="#generator">Live generator</a></li>
+          <li><a href="#evolution">Evolution stages</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#embed">Embed snippets</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-note">
+      Fan-made companion to the git-dragon action. Not affiliated with GitHub, Inc.
+      Contribution data © its respective owners; dragon art MIT-licensed with the project.
+    </p>
+  </div>
+</footer>
+
+<div id="toast" role="status"></div>
+
+<script src="assets/js/data.js?v=2"></script>
+<script src="assets/js/dragon.js?v=2"></script>
+<script src="assets/js/app.js?v=5"></script>
+</body>
+</html>
